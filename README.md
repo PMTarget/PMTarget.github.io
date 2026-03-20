@@ -1,0 +1,1 @@
+A simple web app for uploading, cropping, and resizing images. Runs entirely in your browser - no server required!

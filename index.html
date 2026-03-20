@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Flutter Style Image Resizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6750A4; /* Flutter M3 Primary */
+            --on-primary: #ffffff;
+            --surface: #f7f2fa;
+            --outline: #79747e;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: #fff;
+            color: #1c1b1f;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container { 
+            max-width: 600px; 
+            width: 100%;
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        h1, h2, h3 { color: var(--primary-color); font-weight: 500; }
+        h1 { font-size: 24px; text-align: center; margin-bottom: 24px; }
+
+        /* Карточки секций */
+        .card {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Стили полей ввода */
+        .input-group { 
+            margin: 16px 0; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        label { 
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        input[type="number"], input[type="file"] {
+            padding: 12px;
+            border: 1px solid var(--outline);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border: 2px solid var(--primary-color);
+        }
+
+        /* Кнопка в стиле Flutter Elevated Button */
+        button { 
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: var(--on-primary);
+            border: none;
+            border-radius: 100px; /* Сверхзакругленные углы */
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            filter: brightness(1.1);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .preview { 
+            max-width: 100%; 
+            border-radius: 12px;
+            margin-top: 10px; 
+            box-shadow: var(--shadow);
+        }
+
+        #resultCanvas { 
+            max-width: 100%; 
+            border-radius: 12px; 
+            margin-top: 20px;
+            display: block;
+        }
+
+        .download-btn {
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            margin-top: 15px;
+            font-weight: 500;
+            border: 1px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 100px;
+        }
+
+        /* Кастомные радиокнопки */
+        .radio-group { margin: 8px 0; }
+        .radio-group label { 
+            color: #444; 
+            font-weight: 400; 
+            display: flex; 
+            align-items: center; 
+            cursor: pointer;
+        }
+        input[type="radio"] { margin-right: 10px; accent-color: var(--primary-color); }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Обработка изображения</h1>
+    
+    <div class="card">
+        <div class="input-group">
+            <label for="imageInput">Выберите файл</label>
+            <input type="file" id="imageInput" accept=".jpg,.jpeg,.png">
+        </div>
+        <img id="preview" class="preview" src="#" alt="Preview" style="display:none;">
+        
+        <div id="imageInfo" style="display:none; font-size: 13px; margin-top: 10px;">
+            <p>Оригинал: <span id="natW"></span>x<span id="natH"></span> px (Ratio: <span id="natRatio"></span>)</p>
+        </div>
+    </div>
+    
+    <div id="settings" class="card" style="display:none;">
+        <h3>Настройки вывода</h3>
+        <div class="input-group">
+            <label for="desiredWidth">Ширина (px)</label>
+            <input type="number" id="desiredWidth" min="1" value="1072">
+        </div>
+        <div class="input-group">
+            <label for="desiredHeight">Высота (px)</label>
+            <input type="number" id="desiredHeight" min="1" value="1448">
+        </div>
+        
+        <h3>Область обрезки</h3>
+        <div class="radio-group">
+            <label><input type="radio" name="cropPos" value="top" checked> Сверху / Слева</label>
+        </div>
+        <div class="radio-group">
+            <label><input type="radio" name="cropPos" value="center"> По центру</label>
+        </div>
+        <div class="radio-group">
+            <label><input type="radio" name="cropPos" value="bottom"> Снизу / Справа</label>
+        </div>
+
+        <button id="processBtn">Применить изменения</button>
+    </div>
+    
+    <div id="resultArea" style="display:none; text-align: center;">
+        <h2>Готово!</h2>
+        <canvas id="resultCanvas"></canvas>
+        <a id="downloadLink" class="download-btn">Скачать PNG</a>
+    </div>
+</div>
+
+<script>
+document.getElementById('imageInput').addEventListener('change', handleImageUpload);
+document.getElementById('processBtn').addEventListener('click', processImage);
+
+let imgElement = new Image();
+let naturalWidth, naturalHeight, naturalRatio;
+
+function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        imgElement.onload = function() {
+            naturalWidth = imgElement.naturalWidth;
+            naturalHeight = imgElement.naturalHeight;
+            naturalRatio = naturalWidth / naturalHeight;
+            
+            document.getElementById('preview').src = event.target.result;
+            document.getElementById('preview').style.display = 'block';
+            document.getElementById('imageInfo').style.display = 'block';
+            document.getElementById('settings').style.display = 'block';
+            
+            document.getElementById('natW').textContent = naturalWidth;
+            document.getElementById('natH').textContent = naturalHeight;
+            document.getElementById('natRatio').textContent = naturalRatio.toFixed(3);
+        };
+        imgElement.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function processImage() {
+    const desiredWidth = parseInt(document.getElementById('desiredWidth').value);
+    const desiredHeight = parseInt(document.getElementById('desiredHeight').value);
+    const desiredRatio = desiredWidth / desiredHeight;
+    
+    let cropWidth, cropHeight, offsetX = 0, offsetY = 0;
+    
+    if (naturalRatio < desiredRatio) {
+        cropWidth = naturalWidth;
+        cropHeight = naturalWidth / desiredRatio;
+        const excess = naturalHeight - cropHeight;
+        const cropPos = document.querySelector('input[name="cropPos"]:checked').value;
+        if(cropPos === 'bottom') offsetY = excess;
+        else if(cropPos === 'center') offsetY = excess / 2;
+    } 
+    else {
+        cropHeight = naturalHeight;
+        cropWidth = naturalHeight * desiredRatio;
+        const excess = naturalWidth - cropWidth;
+        const cropPos = document.querySelector('input[name="cropPos"]:checked').value;
+        if(cropPos === 'bottom') offsetX = excess;
+        else if(cropPos === 'center') offsetX = excess / 2;
+    }
+
+    const canvas = document.getElementById('resultCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = desiredWidth;
+    canvas.height = desiredHeight;
+    
+    ctx.drawImage(imgElement, offsetX, offsetY, cropWidth, cropHeight, 0, 0, desiredWidth, desiredHeight);
+    
+    document.getElementById('resultArea').style.display = 'block';
+    const downloadLink = document.getElementById('downloadLink');
+    downloadLink.href = canvas.toDataURL('image/png');
+    downloadLink.download = `resized_${desiredWidth}x${desiredHeight}.png`;
+}
+</script>
+</body>
+</html>

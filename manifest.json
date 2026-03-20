@@ -1,0 +1,16 @@
+{
+  "name": "Image Resizer Flutter",
+  "short_name": "Resizer",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f7f2fa",
+  "theme_color": "#6750A4",
+  "icons": [
+    {      "src": "https://cdn-icons-png.flaticon.com/512/1059/1059106.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+ 
