@@ -1,16 +1,36 @@
 {
-  "name": "Image Resizer Flutter",
-  "short_name": "Resizer",
-  "start_url": ".",
+  "name": "Image Resizer For PocketBook",
+  "short_name": "Cut Image",
+  "description": "A simple web app for uploading, cropping, and resizing images",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f7f2fa",
   "theme_color": "#6750A4",
   "icons": [
-    {      "src": "https://cdn-icons-png.flaticon.com/512/1059/1059106.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+    {
+      "src": "/Images/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/Images/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Cut Image",
+      "short_name": "Cut Image",
+      "description": "Resize an image",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/Images/favicon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
- 
