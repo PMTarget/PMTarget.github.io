@@ -1,16 +1,25 @@
-const CACHE_NAME = 'resizer-v1';const ASSETS = [
+const CACHE_NAME = 'resizer-v1';
+const ASSETS = [
   './',
   './index.html',
-  'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap'];
+  './manifest.json',
+  './sw.js',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+  'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap'
+];
+
 // Установка: кешируем файлы
 self.addEventListener('install', (event) => {
-  event.waitUntil(    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
-// Активация: чистим старый кеш
 
+// Активация: чистим старый кеш
 self.addEventListener('activate', (event) => {
-  event.waitUntil(    caches.keys().then((keys) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
       return Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
     })
   );
@@ -24,4 +33,3 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
- 
